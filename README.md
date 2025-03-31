@@ -19,7 +19,7 @@ PSMS Data Extractor automates data collection from the BITS PSMS website using S
 ## How to use
 1. Clone this repository:  
    ```sh
-   git clone https://github.com/yourusername/psms-data-extractor.git  
+   git clone https://github.com/Vivek5170/psms-data-extractor.git  
    cd psms-data-extractor
 2. Place your stationss.xlsx file (containing Station IDs and names) in the project folder.
 3. Fill your login credentials.
