@@ -23,7 +23,7 @@ station_ids = df.iloc[:, 0].dropna().tolist()
 station_names = df.iloc[:, 1].tolist()
 city = df.iloc[:, 3].tolist()
 domain = df.iloc[:, 2].tolist()
-country = df.iloc[:, 4].tolist()
+country = df.iloc[:, 5].tolist()
 
 
 driver = webdriver.Chrome()
