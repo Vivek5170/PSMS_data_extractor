@@ -27,5 +27,8 @@ PSMS Data Extractor automates data collection from the BITS PSMS website using S
    ```sh
    python method2.py
 
+## Note
+- In drop downs in view page of a company the program auto selects the first option for Select Problem Bank and Select project
+
 ## Disclaimer
 - This script is for personal and academic use only. Ensure compliance with BITS policies before using it.
