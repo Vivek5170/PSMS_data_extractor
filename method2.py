@@ -114,9 +114,9 @@ for station_id in station_ids[:5]:
                             timings = "N/A"
 
             temp = re.search(r"Weekly Holidays\n(.*)", page_text,re.DOTALL)
-            holidays = find_days(temp.group(1).strip())
-            if(holidays==" "):
-                holidays='Not mentioned'
+            holidays = find_days(temp.group(1).strip()).strip()
+            if(holidays==""):
+                holidays='N/A'
             non_tech_match = re.search(r"Non Technical Skills\n(.*)", tables[5].text, re.DOTALL)
             non_tech_skills = non_tech_match.group(1).strip() if non_tech_match else "N/A"
             if non_tech_skills == '':
