@@ -40,7 +40,7 @@ time.sleep(5)
 
 extracted_data = []
 
-for station_id in station_ids[:5]:
+for station_id in station_ids:
  retry=0
  print("opening url for:")
  print(station_id)
