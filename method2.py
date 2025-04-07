@@ -33,8 +33,8 @@ time.sleep(2)
 username = driver.find_element(By.ID, "userId")
 password = driver.find_element(By.ID, "password")  
 login_button = driver.find_element(By.CSS_SELECTOR, ".btn")  
-username.send_keys("f2023XXXX@hyderabad.bits-pilani.ac.in") 
-password.send_keys("XXXXXXX")  # Enter your password
+username.send_keys("f2023xxxx@hyderabad.bits-pilani.ac.in") 
+password.send_keys("xxxxxxx")  # Enter your password
 login_button.click()
 time.sleep(5)
 
@@ -65,7 +65,7 @@ for station_id in station_ids:
             print(f"Dropdowns not found for Station ID {station_id}")
             retry=retry+1
             if retry == 3:
-                extracted_data.append([station_id, station_names[station_ids.index(station_id)],  city[station_ids.index(station_id)], country[station_ids.index(station_id)], domain[station_ids.index(station_id)], "Error", "Error", "Error", "Error", "Error", "Error", "Error"])
+                extracted_data.append([station_id, station_names[station_ids.index(station_id)],  city[station_ids.index(station_id)], country[station_ids.index(station_id)], domain[station_ids.index(station_id)], "Error", "Error", "Error", "Error", "Error", "Error", "Error","Error","Error"])
             continue
 
         tables = driver.find_elements(By.TAG_NAME, "table")
@@ -86,6 +86,18 @@ for station_id in station_ids:
 
             temp = re.search(r"Non Technical Skills\n(.*?)(?:Facility|$)", page_text,re.DOTALL)
             non_tech_skills = temp.group(1).strip() if temp else "N/A"
+
+            temp = re.search(r"Project Title\n(.*?)(?:Project Description|$)", page_text,re.DOTALL)
+            project_title = temp.group(1).strip() if temp else "N/A"
+            project_title = project_title.strip()
+            if(project_title == ""):
+                project_title="N/A"
+            
+            temp= re.search(r"Project Title\n(.*)", tables[0].text,re.DOTALL)
+            project_description = temp.group(1).strip() if temp else "N/A"
+            project_description = project_description.strip()
+            if(project_description==""):
+                project_description = "N/A"
 
             temp = re.search(r"Stipend For First Degree\n(.*?)(?:Stipend For Higher Degree|$)", page_text,re.DOTALL)
             stipend = temp.group(1).strip() if temp.group(1) else "0"
@@ -122,8 +134,8 @@ for station_id in station_ids:
             if non_tech_skills == '':
                 non_tech_skills = "N/A"
 
-
             print("Name: ",station_names[station_ids.index(station_id)])
+            print("Project Title: ",project_title)
             print("Branches: ",branches)
             print("Tech skills: ",tech_skills)
             print("Non-tech skills: ",non_tech_skills)
@@ -135,10 +147,10 @@ for station_id in station_ids:
         else:
             retry += 1
             if retry == 3:
-                extracted_data.append([station_id, station_names[station_ids.index(station_id)],  city[station_ids.index(station_id)], country[station_ids.index(station_id)], domain[station_ids.index(station_id)], "Error", "Error", "Error", "Error", "Error", "Error", "Error"])
+                extracted_data.append([station_id, station_names[station_ids.index(station_id)],  city[station_ids.index(station_id)], country[station_ids.index(station_id)], domain[station_ids.index(station_id)], "Error", "Error", "Error", "Error", "Error", "Error", "Error","Error","Error"])
             continue
         # Store extracted data
-        extracted_data.append([station_id,station_names[station_ids.index(station_id)],  city[station_ids.index(station_id)], country[station_ids.index(station_id)], domain[station_ids.index(station_id)], branches, accomodation, timings, holidays, stipend,tech_skills,non_tech_skills])
+        extracted_data.append([station_id,station_names[station_ids.index(station_id)],  city[station_ids.index(station_id)], country[station_ids.index(station_id)], domain[station_ids.index(station_id)], branches, accomodation, timings, holidays, stipend,tech_skills,non_tech_skills,project_title,project_description])
         text= None
         break
 
@@ -146,10 +158,10 @@ for station_id in station_ids:
             print(f"Retry {retry + 1} for station {station_id}: {e}")
             retry += 1
             if retry == 3:
-                extracted_data.append([station_id, station_names[station_ids.index(station_id)], city[station_ids.index(station_id)], country[station_ids.index(station_id)], domain[station_ids.index(station_id)], "Error", "Error", "Error", "Error", "Error", "Error", "Error"])
+                extracted_data.append([station_id, station_names[station_ids.index(station_id)], city[station_ids.index(station_id)], country[station_ids.index(station_id)], domain[station_ids.index(station_id)], "Error", "Error", "Error", "Error", "Error", "Error", "Error","Error","Error"])
 
 
-output_df = pd.DataFrame(extracted_data, columns=["Station ID","Station Name", "City", "Country", "Domain", "Branches","Accomodation","Timings","Weekly Holidays","Stipend for Single Degree","Tech skills","Non Tech skills"])
+output_df = pd.DataFrame(extracted_data, columns=["Station ID","Station Name", "City", "Country", "Domain", "Branches","Accomodation","Timings","Weekly Holidays","Stipend for Single Degree","Tech skills","Non Tech skills","Project Title","Project Description"])
 output_file = "extracted_data.xlsx"
 output_df.to_excel(output_file, index=False)
 
