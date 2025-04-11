@@ -7,7 +7,8 @@ import pandas as pd
 import time
 import re
 import random
-from multiprocessing import Process, Queue
+import os
+from multiprocessing import Process
 
 def find_days(text):
     days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"]
@@ -70,21 +71,22 @@ def run_scraper(station_ids, station_names, city, domain, country, id):
 
                     temp = re.search(r"Technical Skills\n(.*?)(?:Non Technical Skills|$)", page_text, re.DOTALL)
                     tech_skills = temp.group(1).strip() if temp else "N/A"
+                    tech_skills = tech_skills if tech_skills!='' else "N/A"
 
                     temp = re.search(r"Non Technical Skills\n(.*?)(?:Facility|$)", page_text, re.DOTALL)
-                    non_tech_skills = temp.group(1).strip() if temp else "N/A"
+                    non_tech_skills = temp.group(1).strip() if temp!='' else "N/A"
 
                     temp = re.search(r"Project Title\n(.*?)(?:Project Description|$)", page_text, re.DOTALL)
                     project_title = temp.group(1).strip() if temp else "N/A"
-                    project_title = project_title if project_title else "N/A"
+                    project_title = project_title if project_title!='' else "N/A"
 
                     temp = re.search(r"Project Title\n(.*)", tables[0].text, re.DOTALL)
                     project_description = temp.group(1).strip() if temp else "N/A"
-                    project_description = project_description if project_description else "N/A"
+                    project_description = project_description if project_description!='' else "N/A"
 
                     temp = re.search(r"Stipend For First Degree\n(.*?)(?:Stipend For Higher Degree|$)", page_text, re.DOTALL)
-                    stipend = temp.group(1).strip() if temp.group(1).strip() else "0"
-                    stipend = stipend if stipend else "0"
+                    stipend = temp.group(1).strip() if temp.group(1).strip() else 0
+                    stipend = stipend if stipend!='' else 0
 
                     temp = re.search(r"Accommodation\s*:\s*(YES|NO)", page_text, re.IGNORECASE)
                     accomodation = temp.group(1).strip() if temp else "YES"
@@ -101,14 +103,16 @@ def run_scraper(station_ids, station_names, city, domain, country, id):
                         timings = f"{start_hour}:{start_min:02d} {start_period} to {end_hour}:{end_min:02d} {end_period}"
                     else:
                         timings = "N/A"
+                    timings=timings if timings !="" else "N/A"
+
 
                     temp = re.search(r"Weekly Holidays\n(.*)", page_text, re.DOTALL)
                     holidays = find_days(temp.group(1).strip()) if temp else 'N/A'
-                    holidays = holidays if holidays else 'N/A'
+                    holidays = holidays if holidays!='' else 'N/A'
 
                     non_tech_match = re.search(r"Non Technical Skills\n(.*)", tables[5].text, re.DOTALL)
-                    non_tech_skills = non_tech_match.group(1).strip() if non_tech_match else non_tech_skills
-                    non_tech_skills = non_tech_skills if non_tech_skills else "N/A"
+                    non_tech_skills = non_tech_match.group(1).strip() if non_tech_match else "N/A"
+                    non_tech_skills = non_tech_skills if non_tech_skills!='' else "N/A"
 
                     print("Name:", station_names[idx])
                     print("Project Title:", project_title)
@@ -134,7 +138,7 @@ def run_scraper(station_ids, station_names, city, domain, country, id):
     except Exception as e:
         print(e)
     finally:
-        output_df = pd.DataFrame(all_data, columns=["Station ID","Station Name", "City", "Country", "Domain", "Branches","Accomodation","Timings","Weekly Holidays","Stipend for Single Degree","Tech skills","Non Tech skills","Project Title","Project Description"])
+        output_df = pd.DataFrame(extracted_data, columns=["Station ID","Station Name", "City", "Country", "Domain", "Branches","Accomodation","Timings","Weekly Holidays","Stipend for Single Degree","Tech skills","Non Tech skills","Project Title","Project Description"])
         output_file = f"extracted_data{id}.xlsx"
         output_df.to_excel(output_file, index=False)
         time.sleep(5)
@@ -168,10 +172,18 @@ if __name__ == "__main__":
     try:
         results1 = pd.read_excel( "extracted_data1.xlsx")
         results2 = pd.read_excel( "extracted_data2.xlsx")
-        all_data = results1 + results2
+        all_data = pd.concat([results1, results2], ignore_index=True)
         output_df = pd.DataFrame(all_data, columns=["Station ID","Station Name", "City", "Country", "Domain", "Branches","Accomodation","Timings","Weekly Holidays","Stipend for Single Degree","Tech skills","Non Tech skills","Project Title","Project Description"])
         output_file = "extracted_data.xlsx"
         output_df.to_excel(output_file, index=False)
         print(f"Data saved to {output_file}")
+        files_to_delete = ["extracted_data1.xlsx", "extracted_data2.xlsx"]
+
+        for file in files_to_delete:
+            if os.path.exists(file):
+                os.remove(file)
+                print(f"{file} has been deleted.")
+            else:
+                print(f"{file} does not exist.")
     except Exception as e:
         print(e)
